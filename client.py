@@ -1,7 +1,7 @@
 from twisted.internet.protocol import Protocol, ClientFactory
-from sys import stdout
 from twisted.internet import reactor, stdio
 from twisted.protocols.basic import LineReceiver
+from sys import stdout
 import json
 
 class CommandReader(LineReceiver):
@@ -19,6 +19,7 @@ class CommandReader(LineReceiver):
 
 class ServerInterfaceProtocol(Protocol):
     def dataReceived(self, data):
+        # Decodes result received from server and prints to stdout
         print json.loads(data).values()[0]
 
 class CommandClientFactory(ClientFactory):
