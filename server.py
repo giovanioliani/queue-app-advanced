@@ -1,12 +1,11 @@
-from __future__ import print_function
+from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import ClientFactory
 from twisted.internet.endpoints import TCP4ServerEndpoint
 from twisted.internet import reactor
-from twisted.internet.protocol import Protocol
 from collections import deque
 import json
 
-class QueueManager():
+class QueueManager(object):
 	def __init__(self):
 		# Stack with available operators (LIFO)
 		self.available = ['B', 'A']
@@ -95,11 +94,12 @@ class ManagerInterfaceProtocol(Protocol):
 		self.factory = factory
 
 	def dataReceived(self, data):
+		# Decodes JSON command string received from client
 		command = json.loads(data).values()
-		#self.transport.write(json.dumps({"response": "Call 1 received"}))
+		# Gets operation result from QueueManager object
 		result = getattr(self.factory.queues, "do_" + command[0])(command[1])
-		print(result)
-		#self.transport.write(json.dumps({"response": result}))
+		# Encodes operation result and sends to the client
+		self.transport.write(json.dumps({"response": result}))
 
 class ManagerInterfaceFactory(ClientFactory):
 	def __init__(self):
